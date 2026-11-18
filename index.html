@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Don't Blink</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 왼쪽: 게임 -->
+    <main id="main">
+      <div id="hud">
+        <div class="hud-side">
+          <span class="label">나</span>
+          <span id="livesPlayer" class="hearts">♥♥♥</span>
+        </div>
+
+        <div class="hud-center">
+          <div id="role">Don't Blink</div>
+          <div id="dryBox" class="dry inactive">
+            <span class="label">괴물 눈 건조</span>
+            <div class="bar"><div id="dryBar"></div></div>
+            <span id="dryText">0%</span>
+            <span id="timer">00:00</span>
+          </div>
+        </div>
+
+        <div class="hud-side right">
+          <span id="livesMonster" class="hearts">♥♥♥</span>
+          <span class="label">괴물</span>
+        </div>
+      </div>
+
+      <div id="stage">
+        <canvas id="game" width="960" height="540"></canvas>
+        <div id="notice" hidden>얼굴이 보이지 않아 일시정지했어요</div>
+        <div id="overlay" class="overlay"></div>
+      </div>
+    </main>
+
+    <!-- 오른쪽: 카메라와 디버그 -->
+    <aside id="side">
+      <div id="camWrap">
+        <video id="cam" playsinline muted></video>
+        <div class="badges">
+          <span id="eyeIcon" title="눈 상태">…</span>
+          <span id="micIcon" title="마이크 판정">…</span>
+        </div>
+      </div>
+      <button id="recalBtn" disabled>🎯 재보정 (기준점 다시 맞추기)</button>
+      <pre id="debug"></pre>
+    </aside>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>
