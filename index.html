@@ -4,55 +4,98 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Don't Blink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=Do+Hyeon&display=swap"
+  />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app">
-    <!-- 왼쪽: 게임 -->
-    <main id="main">
-      <div id="hud">
-        <div class="hud-side">
-          <span class="label">나</span>
-          <span id="livesPlayer" class="hearts">♥♥♥</span>
+  <!-- 게임 화면 (1280×720 기준, 창 크기에 맞춰 확대/축소) -->
+  <div id="viewport">
+    <div id="screen">
+      <!-- 상단 HUD -->
+      <header id="hud">
+        <div class="hp">
+          <span class="hud-label">PLAYER HP</span>
+          <div id="livesPlayer" class="hearts"></div>
         </div>
 
-        <div class="hud-center">
-          <div id="role">Don't Blink</div>
-          <div id="dryBox" class="dry inactive">
-            <span class="label">괴물 눈 건조</span>
-            <div class="bar"><div id="dryBar"></div></div>
-            <span id="dryText">0%</span>
-            <span id="timer">00:00</span>
+        <div id="roleBox" class="role">
+          <span class="role-label">ROLE</span>
+          <span id="roleName" class="role-name">—</span>
+          <span id="roleSub" class="role-sub"></span>
+        </div>
+
+        <div class="hp right">
+          <span class="hud-label">MONSTER HP</span>
+          <div id="livesMonster" class="hearts"></div>
+        </div>
+      </header>
+
+      <!-- 게임 맵 -->
+      <main id="arena">
+        <canvas id="game" width="1216" height="564"></canvas>
+
+        <aside id="dryPanel" class="panel dry">
+          <span class="panel-title">MONSTER EYE<br />DRYNESS</span>
+          <img id="dryEye" src="assets/eye_0.svg" alt="괴물 눈 상태" />
+          <span id="dryText" class="dry-text">0%</span>
+          <div class="dry-bar"><div id="dryBar"></div></div>
+          <span id="dryHint" class="dry-hint">쫓길 때만 작동</span>
+        </aside>
+
+        <div id="msgBox" class="msg">
+          <span class="msg-icon">!</span>
+          <div class="msg-text">
+            <span id="msgTitle">LOOK TO MOVE</span>
+            <span id="msgSub">깜빡이면 술래가 바뀌어요</span>
           </div>
         </div>
 
-        <div class="hud-side right">
-          <span id="livesMonster" class="hearts">♥♥♥</span>
-          <span class="label">괴물</span>
+        <div id="inputBox" class="input">
+          <span id="inputMain">EYES OPEN</span>
+          <span class="sep">|</span>
+          <span id="inputSub">BLINKS 00</span>
         </div>
-      </div>
 
-      <div id="stage">
-        <canvas id="game" width="960" height="540"></canvas>
-        <div id="notice" hidden>얼굴이 보이지 않아 일시정지했어요</div>
-        <div id="overlay" class="overlay"></div>
-      </div>
-    </main>
-
-    <!-- 오른쪽: 카메라와 디버그 -->
-    <aside id="side">
-      <div id="camWrap">
-        <video id="cam" playsinline muted></video>
-        <div class="badges">
-          <span id="eyeIcon" title="눈 상태">…</span>
-          <span id="micIcon" title="마이크 판정">…</span>
-          <span id="mouthIcon" title="입 모양">…</span>
+        <div id="timeBox" class="time">
+          <span class="time-label">TIME</span>
+          <span id="timer">00:00</span>
         </div>
+
+        <div id="attackWarn" class="attack-warn" hidden>
+          <div id="attackName" class="warn-bar">!! FLASH ATTACK !!</div>
+          <p id="attackSub">눈을 감지 말고 버티세요</p>
+        </div>
+      </main>
+
+      <!-- 타이틀 / 보정 / 일시정지 / 결과 화면 -->
+      <div id="overlay" class="overlay"></div>
+
+      <!-- CRT 효과 -->
+      <div id="crt" class="crt">
+        <div class="crt-scan"></div>
+        <div class="crt-vig"></div>
       </div>
-      <button id="recalBtn" disabled>🎯 재보정 (기준점 다시 맞추기)</button>
-      <pre id="debug"></pre>
-    </aside>
+    </div>
   </div>
+
+  <!-- 개발용 패널: 카메라 미리보기, 재보정, 디버그 (D 키로 열고 닫기) -->
+  <aside id="dev" class="collapsed">
+    <pre id="debug" hidden></pre>
+    <div id="camWrap">
+      <video id="cam" playsinline muted></video>
+      <div class="badges">
+        <span id="eyeIcon" title="눈 상태">…</span>
+        <span id="micIcon" title="마이크 판정">…</span>
+        <span id="mouthIcon" title="입 모양">…</span>
+      </div>
+    </div>
+    <button id="recalBtn" disabled>재보정</button>
+  </aside>
 
   <script type="module" src="game.js"></script>
 </body>

@@ -72,6 +72,11 @@ export class MicTracker {
     this.calib = null;
   }
 
+  // 보정 화면 파형 그리기용 (최근 프레임의 소리 모양)
+  getWaveform() {
+    return this.ready ? this.timeBuf : null;
+  }
+
   // ---------- 매 프레임 ----------
   update(dt) {
     const s = this.state;
@@ -91,8 +96,9 @@ export class MicTracker {
     let n = 0;
     for (let i = this.lo; i <= this.hi; i++) {
       const db = this.freqBuf[i];
-      const p = Number.isFinite(db) ? Math.pow(10, db / 10) : 0;
-      logSum += Math.log(p + 1e-20);
+      // 같은 작은 값을 양쪽에 더해야 결과가 항상 0~1 사이 (조용할 때 값이 튀지 않음)
+      const p = (Number.isFinite(db) ? Math.pow(10, db / 10) : 0) + 1e-12;
+      logSum += Math.log(p);
       linSum += p;
       n++;
     }

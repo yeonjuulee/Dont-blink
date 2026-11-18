@@ -3,17 +3,29 @@
 // 테스트하면서 숫자만 바꿔서 조정하세요.
 // =====================================================
 export const CONFIG = {
-  // ---------- 화면 ----------
-  WIDTH: 960,
-  HEIGHT: 540,
+  // ---------- 화면 (게임 맵 크기) ----------
+  WIDTH: 1216,
+  HEIGHT: 564,
 
   // ---------- 캐릭터 ----------
-  PLAYER_RADIUS: 18,
-  MONSTER_RADIUS: 30,
-  PLAYER_SPEED: 210,          // 플레이어 최고 속도 (px/초)
-  MONSTER_CHASE_SPEED: 135,   // 괴물이 술래일 때 쫓는 속도
-  MONSTER_FLEE_SPEED: 165,    // 괴물이 도망칠 때 속도
-  MONSTER_RELAX_DIST: 320,    // 플레이어가 이보다 멀면 괴물이 천천히 도망침
+  PLAYER_RADIUS: 26,          // 충돌 반지름 (그림 크기도 이 값에 맞춰 그려짐)
+  MONSTER_RADIUS: 52,
+  PLAYER_SPEED: 260,          // 플레이어 최고 속도 (px/초)
+  MONSTER_CHASE_SPEED: 165,   // 괴물이 술래일 때 쫓는 속도
+  MONSTER_FLEE_SPEED: 200,    // 괴물이 도망칠 때 속도
+  MONSTER_RELAX_DIST: 400,    // 플레이어가 이보다 멀면 괴물이 천천히 도망침
+
+  // ---------- 괴물의 공격 (내가 술래일 때 나를 깜빡이게 만들기) ----------
+  ATTACK_ENABLED: true,
+  ATTACK_COOLDOWN_MIN: 4,     // 공격 사이 쉬는 시간 (초)
+  ATTACK_COOLDOWN_MAX: 7,
+  ATTACK_NEAR_FASTER: 0.6,    // 가까이 붙어 있으면 쉬는 시간이 이 배율까지 짧아짐
+  ATTACK_FLASH: { weight: 40, warn: 0.6, hit: 0.3 },  // 섬광
+  ATTACK_DUST: { weight: 40, warn: 0.8, hit: 1.2 },   // 먼지 바람
+  ATTACK_SCARE: { weight: 20, warn: 0, hit: 0.5 },    // 깜짝 등장 (예고 없음)
+
+  // ---------- 화면 효과 ----------
+  CRT: true,                  // 스캔라인 + 비네팅
 
   // ---------- 규칙 ----------
   LIVES: 3,
@@ -68,8 +80,8 @@ export const CONFIG = {
   // ---------- 괴물 눈 건조 게이지 ----------
   DRY_RATE: 35,               // 입김을 불 때 초당 증가량 (%)
   DRY_DECAY: 10,              // 입김을 멈췄을 때 초당 감소량 (%)
-  DRY_NEAR_DIST: 120,         // 이 거리 이내면 효과 최대
-  DRY_FAR_DIST: 500,          // 이 거리 이상이면 효과 최소
+  DRY_NEAR_DIST: 180,         // 이 거리 이내면 효과 최대
+  DRY_FAR_DIST: 650,          // 이 거리 이상이면 효과 최소
   DRY_MIN_FACTOR: 0.2,        // 멀 때 배율
   DRY_MAX_FACTOR: 1.6,        // 가까울 때 배율
 
