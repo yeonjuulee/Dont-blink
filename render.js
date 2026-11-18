@@ -61,7 +61,7 @@ export class Renderer {
   updateParticles(game, mic, dt) {
     const p = game.player;
     const m = game.monster;
-    if (game.phase === "playing" && !game.paused && game.chaser === "monster" && mic.isBlowing) {
+    if (game.phase === "playing" && !game.paused && game.chaser === "monster" && game.blowing) {
       const a = Math.atan2(m.y - p.y, m.x - p.x);
       for (let i = 0; i < 3; i++) {
         const spread = (Math.random() - 0.5) * 0.5;

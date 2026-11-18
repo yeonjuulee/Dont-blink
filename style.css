@@ -236,6 +236,11 @@ body {
   overflow: hidden;
 }
 
+#camWrap.blowing {
+  border-color: #6cc6ff;
+  box-shadow: 0 0 0 2px #6cc6ff;
+}
+
 #cam {
   width: 100%;
   height: 100%;

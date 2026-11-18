@@ -48,6 +48,20 @@ export const CONFIG = {
   BREATH_MIN_FLATNESS: 0.16,  // 평탄도가 이 이상이면 입김
   VOICE_MAX_FLATNESS: 0.1,    // 평탄도가 이 이하면 목소리
   BREATH_MIN_DURATION: 0.15,  // 입김이 이만큼 지속돼야 인정 (초)
+  // 입김 판정 방식
+  //  "either" : 바람 소리 또는 입 모양 중 하나만 돼도 입김
+  //  "both"   : 바람 소리와 입 모양이 함께 있어야 입김 (주변 소음에 가장 강함)
+  //  "mic"    : 바람 소리만
+  //  "mouth"  : 입 모양만
+  BLOW_MODE: "either",
+
+  // 입 모양 (입을 동그랗게 오므리기)
+  MOUTH_BLOW_DELTA: 0.3,      // 기준 = 보정 때 평소 입 모양 값 + 이 값 (작을수록 민감)
+  MOUTH_BLOW_MIN: 0.35,       // 기준 하한
+  MOUTH_BLOW_MAX: 0.8,        // 기준 상한
+  MOUTH_MAX_JAW: 0.5,         // 입을 크게 벌리면(아~) 바람 입 모양으로 안 봄
+  MOUTH_MIN_DURATION: 0.15,   // 이만큼 유지해야 인정 (초)
+
   FLATNESS_MIN_HZ: 100,
   FLATNESS_MAX_HZ: 8000,
 

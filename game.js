@@ -31,6 +31,7 @@ const game = {
   banner: null,
   calibTime: 0,
   resumeFrom: null,
+  blowing: false,
   paused: false,
 };
 
@@ -54,7 +55,7 @@ function showIntro() {
     <ul class="rules">
       <li>👀 보는 곳으로 움직여요 (고개와 눈)</li>
       <li>😑 술래가 눈을 깜빡이면 역할이 바뀌어요</li>
-      <li>🌬️ 괴물은 스스로 깜빡이지 않아요. 쫓길 때는 화면에 <b>후~</b> 불어서 눈을 말리세요</li>
+      <li>🌬️ 괴물은 스스로 깜빡이지 않아요. 쫓길 때는 입을 동그랗게 모아 화면에 <b>후~</b> 불어서 눈을 말리세요</li>
       <li>❤️ 목숨 3개를 먼저 다 잃는 쪽이 져요</li>
     </ul>
     <button id="startBtn">카메라 · 마이크 켜고 시작</button>
@@ -296,7 +297,7 @@ function updateDryness(dt, fs, ms) {
   const faceFactor = clamp(fs.closeness, 0.8, 1.5);
   game.dryFactor = distFactor * faceFactor;
 
-  if (ms.isBlowing) game.dryness += CONFIG.DRY_RATE * game.dryFactor * dt;
+  if (game.blowing) game.dryness += CONFIG.DRY_RATE * game.dryFactor * dt;
   else game.dryness -= CONFIG.DRY_DECAY * dt;
   game.dryness = clamp(game.dryness, 0, 100);
 
@@ -362,7 +363,25 @@ function endGame(winner) {
 // =====================================================
 // 메인 루프
 // =====================================================
+// 입김 판정: 바람 소리(마이크)와 입 모양(카메라)을 BLOW_MODE에 따라 합침
+function computeBlowing(fs, ms) {
+  const sound = ms.isBlowing;
+  const mouth = fs.faceFound && fs.mouthBlow;
+  switch (CONFIG.BLOW_MODE) {
+    case "both":
+      return sound && mouth;
+    case "mic":
+      return sound;
+    case "mouth":
+      return mouth;
+    default:
+      return sound || mouth;
+  }
+}
+
 function update(dt, fs, ms) {
+  game.blowing = computeBlowing(fs, ms);
+
   if (game.banner) {
     game.banner.t -= dt;
     if (game.banner.t <= 0) game.banner = null;
@@ -409,6 +428,8 @@ function updateHUD(fs, ms) {
   // 입력 감지 표시 (조건 04)
   $("eyeIcon").textContent = !fs.ready ? "…" : !fs.faceFound ? "❓" : fs.eyesClosed ? "➖" : "👁️";
   $("micIcon").textContent = !ms.ready ? "…" : ms.isBlowing ? "🌬️" : ms.isVoice ? "🔊" : "🎤";
+  $("mouthIcon").textContent = !fs.ready ? "…" : fs.mouthBlow ? "😗" : "😐";
+  $("camWrap").classList.toggle("blowing", game.blowing);
   $("notice").hidden = !(game.phase === "playing" && game.paused);
 }
 
@@ -439,6 +460,13 @@ function updateDebug(fs, ms, dt) {
     `평탄도      ${f(ms.flatness)}`,
     `            입김 ≥ ${CONFIG.BREATH_MIN_FLATNESS}, 목소리 ≤ ${CONFIG.VOICE_MAX_FLATNESS}`,
     `판정        ${ms.isBlowing ? "입김" : ms.isVoice ? "목소리" : "-"}`,
+    "",
+    "── 입 모양 ──",
+    `오므림      ${f(fs.pucker)} / 기준 ${f(fs.mouthThreshold)}`,
+    `입 벌림     ${f(fs.jawOpen)} / 최대 ${CONFIG.MOUTH_MAX_JAW}`,
+    `판정        ${fs.mouthBlow ? "바람 입 모양" : "-"}`,
+    "",
+    `최종 입김   ${game.blowing ? "O" : "-"}   (방식: ${CONFIG.BLOW_MODE})`,
     "",
     "── 게임 ──",
     `단계        ${game.phase}`,

@@ -34,6 +34,8 @@ export class FaceTracker {
     this.baseFaceWidth = 0.3;
     this.blinkBase = null; // 눈 뜬 상태의 eyeBlink 값 (보정으로 측정)
     this.lookDownBase = 0;
+    this.puckerBase = null; // 평소 입 모양 값 (보정으로 측정)
+    this.mouthStart = null; // 입을 오므리기 시작한 시각
     this.calib = null;
     this.frameTimes = [];
 
@@ -45,6 +47,10 @@ export class FaceTracker {
       blinkBase: null,
       blinkThreshold: CONFIG.BLINK_THRESHOLD,
       detectFps: 0, // 1초에 얼굴을 몇 번 분석하는지
+      pucker: 0, // 입 오므림 정도 (mouthPucker와 mouthFunnel 중 큰 값)
+      jawOpen: 0,
+      mouthThreshold: CONFIG.MOUTH_BLOW_MIN,
+      mouthBlow: false, // 바람 부는 입 모양인지
       eyesClosed: false,
       blinkEvent: false, // 눈을 감는 순간 한 프레임만 true
       blinkCount: 0,
@@ -92,7 +98,7 @@ export class FaceTracker {
 
   // ---------- 보정 ----------
   startCalibration() {
-    this.calib = { x: [], y: [], w: [], b: [], ld: [] };
+    this.calib = { x: [], y: [], w: [], b: [], ld: [], m: [] };
   }
 
   addCalibrationSample() {
@@ -102,6 +108,7 @@ export class FaceTracker {
     this.calib.w.push(this.state.faceWidth);
     this.calib.b.push(this.state.blink);
     this.calib.ld.push(this.state.lookDown);
+    this.calib.m.push(this.state.pucker);
   }
 
   finishCalibration() {
@@ -112,6 +119,7 @@ export class FaceTracker {
       this.baseFaceWidth = median(this.calib.w) || this.baseFaceWidth;
       this.blinkBase = median(this.calib.b);
       this.lookDownBase = median(this.calib.ld);
+      this.puckerBase = median(this.calib.m);
       this.state.blinkBase = this.blinkBase;
     }
     this.calib = null;
@@ -146,6 +154,8 @@ export class FaceTracker {
       s.faceFound = false;
       s.moveX = 0;
       s.moveY = 0;
+      s.mouthBlow = false;
+      this.mouthStart = null;
       this.closedFrames = 0;
       return s;
     }
@@ -186,6 +196,22 @@ export class FaceTracker {
       }
     }
     s.eyesClosed = this.eyesClosed;
+
+    // ----- 입 모양 (바람 불기) -----
+    s.pucker = Math.max(g("mouthPucker"), g("mouthFunnel"));
+    s.jawOpen = g("jawOpen");
+    s.mouthThreshold =
+      this.puckerBase == null
+        ? CONFIG.MOUTH_BLOW_MIN
+        : Math.min(CONFIG.MOUTH_BLOW_MAX, Math.max(CONFIG.MOUTH_BLOW_MIN, this.puckerBase + CONFIG.MOUTH_BLOW_DELTA));
+    const rounded = s.pucker > s.mouthThreshold && s.jawOpen < CONFIG.MOUTH_MAX_JAW;
+    if (rounded) {
+      if (this.mouthStart == null) this.mouthStart = now;
+      s.mouthBlow = now - this.mouthStart >= CONFIG.MOUTH_MIN_DURATION * 1000;
+    } else {
+      this.mouthStart = null;
+      s.mouthBlow = false;
+    }
 
     // ----- 고개 방향 -----
     const lm = res.faceLandmarks[0];
